@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Flickerbook</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+	</head>
+	<body>
+		<div id="main">
+
+			<div id="spinner"></div>
+
+			<div id="controls">
+				<input type="button" id="play" value="play" data-action="play" />
+				<input type="button" id="pause" value="pause" data-action="pause" />
+				<input type="button" id="stop" value="stop" data-action="stop" />
+				<input type="button" id="stopEnd" value="stop (end)" data-action="stop" data-args="[true]" />
+				<input type="button" id="reverse" value="reverse" data-action="reverse" />
+				<input type="button" id="resume" value="resume" data-action="resume" />
+				<input type="button" id="toggle" value="toggle" data-action="toggle" />
+				<br />
+				<input type="button" id="show" value="show" data-action="show" />
+				<input type="button" id="showAuto" value="show (autoplay)" data-action="show" data-args="[true]" />
+				<input type="button" id="hide" value="hide" data-action="hide" />
+				<br />
+				<input type="text" id="fps" value="12" />
+				<input type="button" id="changeFps" value="change fps" data-action="changeFps" />
+			</div>
+
+		</div>
+
+		<!-- scripts -->
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+		<script type="text/javascript" src="jquery.flickerbook.js"></script>
+		<!--[if IE]>
+			<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+
+		<script type="text/javascript">
+			var spinner;
+
+			jQuery(document).ready(function() {
+				spinner = new $.flickerBook($('#spinner'));
+				$('#controls input[type=button]').click(function(evt) {
+					var action, args;
+
+					action = $(this).data('action');
+					args = eval($(this).data('args'));
+					if (action === 'changeFps') {
+						args = [parseInt($('#fps').val(), 10)];
+					}
+
+					console.log('action', action, 'args', args);
+					spinner[action].apply(null, args);
+				});
+				$('#fps').bind('change', function(evt) {
+					console.log('change');
+				});
+			});
+		</script>
+	</body>
+</html>
