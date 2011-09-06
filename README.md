@@ -1,1 +1,3 @@
-#flickerbook.js
+#stopmotion.js
+
+more soon ...
