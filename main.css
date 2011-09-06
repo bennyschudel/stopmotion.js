@@ -8,9 +8,14 @@
 }
 
 #spinner {
-	width: 24px;
-	height: 24px;
-	background-color: grey;
+	width: 128px;
+	height: 128px;
+	background-color: rgb(42,143,189);
 	background-image: url(spinner.png);
 	background-position: 0 0;
+	border: 10px solid rgb(42,143,189);
+}
+
+#controls {
+	margin-top: 50px;
 }

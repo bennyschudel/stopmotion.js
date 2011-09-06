@@ -1,6 +1,6 @@
 (function($) {
 
-	$.flickerBook = function(el, options) {
+	$.StopMotion = function(el, options) {
 		var self, core, init,
 			setState, setDirection,
 			isVisible, isForward, isBackward, isPlaying, isPaused, isStopped, changeFps,
@@ -159,9 +159,6 @@
 		};
 
 		moveBackgroundTo = function(x, y) {
-			x = x || 0;
-			y = y || 0;
-
 			core.offset = [x, y];
 			el.css('background-position', core.offset.join('px '));
 		};
@@ -197,13 +194,12 @@
 		};
 
 		run = function() {
-			var fnc;
-
 			if (!isVisible()) { return; }
 
 			clearInterval(core.interval);
-			fnc = isBackward() ? gotoPreviousFrame : gotoNextFrame;
-			core.interval = setInterval(fnc, 1e3 / settings.fps);
+			core.interval = setInterval(function() {
+				isBackward() ? gotoPreviousFrame() : gotoNextFrame();
+			}, 1e3 / settings.fps);
 		};
 
 		init();

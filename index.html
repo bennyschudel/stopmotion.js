@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 	<head>
 		<meta charset="utf-8" />
-		<title>Flickerbook</title>
+		<title>stopmotion.js</title>
 		<link rel="stylesheet" type="text/css" media="screen" href="main.css" />
 	</head>
 	<body>
@@ -30,7 +30,7 @@
 
 		<!-- scripts -->
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
-		<script type="text/javascript" src="jquery.flickerbook.js"></script>
+		<script type="text/javascript" src="jquery.stopmotion.js"></script>
 		<!--[if IE]>
 			<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
@@ -39,7 +39,7 @@
 			var spinner;
 
 			jQuery(document).ready(function() {
-				spinner = new $.flickerBook($('#spinner'));
+				spinner = new $.StopMotion($('#spinner'));
 				$('#controls input[type=button]').click(function(evt) {
 					var action, args;
 
