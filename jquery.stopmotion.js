@@ -1,7 +1,7 @@
 (function($) {
 
-	$.StopMotion = function(el, options) {
-		var self, core, init,
+	$.StopMotion = function(element, options) {
+		var self, el, core, init,
 			setState, setDirection,
 			isVisible, isForward, isBackward, isPlaying, isPaused, isStopped, changeFps,
 			run, getDimensions, moveBackgroundTo, gotoFrame, gotoNextFrame, gotoPreviousFrame;
@@ -13,7 +13,7 @@
 			frames: 12,
 			width: null,
 			height: null,
-			loop: false
+			loop: true
 		};
 		settings = {};
 
@@ -29,6 +29,7 @@
 		// init
 		init = function() {
 			settings = $.extend(true, {}, defaults, options);
+			el = $(element);
 
 			grabDimensions();
 			self.play();

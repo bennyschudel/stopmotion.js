@@ -7,7 +7,7 @@
 	<body>
 		<div id="main">
 
-			<div id="spinner"></div>
+			<div id="countdown"></div>
 
 			<div id="controls">
 				<input type="button" id="play" value="play" data-action="play" />
@@ -42,7 +42,7 @@
 			var spinner;
 
 			jQuery(document).ready(function() {
-				spinner = new $.StopMotion($('#spinner'), {
+				spinner = new $.StopMotion('#countdown', {
 					fps: 12,
 					frames: 28
 				});
