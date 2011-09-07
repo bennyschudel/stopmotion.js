@@ -18,6 +18,9 @@
 				<input type="button" id="resume" value="resume" data-action="resume" />
 				<input type="button" id="toggle" value="toggle" data-action="toggle" />
 				<br />
+				<input type="checkbox" id="loop" checked="checked" data-action="loop" />
+				<label for="loop">loop</label>
+				<br />
 				<input type="button" id="show" value="show" data-action="show" />
 				<input type="button" id="showAuto" value="show (autoplay)" data-action="show" data-args="[true]" />
 				<input type="button" id="hide" value="hide" data-action="hide" />
@@ -39,14 +42,22 @@
 			var spinner;
 
 			jQuery(document).ready(function() {
-				spinner = new $.StopMotion($('#spinner'));
-				$('#controls input[type=button]').click(function(evt) {
+				spinner = new $.StopMotion($('#spinner'), {
+					fps: 12,
+					frames: 28
+				});
+				$('#controls input').click(function(evt) {
 					var action, args;
 
 					action = $(this).data('action');
 					args = eval($(this).data('args'));
-					if (action === 'changeFps') {
-						args = [parseInt($('#fps').val(), 10)];
+					switch (action) {
+						case 'changeFps':
+							args = [parseInt($('#fps').val(), 10)];
+							break;
+						case 'loop':
+							args = [$('#loop').is(':checked')];
+							break;
 					}
 
 					console.log('action', action, 'args', args);

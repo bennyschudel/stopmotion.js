@@ -8,12 +8,12 @@
 }
 
 #spinner {
-	width: 128px;
-	height: 128px;
-	background-color: rgb(42,143,189);
-	background-image: url(spinner.png);
+	width: 160px;
+	height: 120px;
+	background-color: black;
+	background-image: url(countdown.jpg);
 	background-position: 0 0;
-	border: 10px solid rgb(42,143,189);
+	border: 10px solid black;
 }
 
 #controls {

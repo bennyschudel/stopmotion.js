@@ -12,7 +12,8 @@
 			fps: 12,
 			frames: 12,
 			width: null,
-			height: null
+			height: null,
+			loop: false
 		};
 		settings = {};
 
@@ -97,6 +98,10 @@
 			run();
 		};
 
+		self.loop = function(loop) {
+			settings.loop = loop;
+		};
+
 		self.show = function(autoplay) {
 			if (isVisible()) { return self; }
 
@@ -164,13 +169,15 @@
 		};
 
 		gotoFrame = function(frame) {
-			var x, y;
+			var x, y, exit;
 
 			// create loop
 			if (isBackward() && frame < 1) {
+				if (!settings.loop) { return self.pause(); }
 				frame = settings.frames;
 			}
 			else if (frame > settings.frames) {
+				if (!settings.loop) { return self.pause(); }
 				frame = 1;
 			}
 			core.frame = frame;
@@ -178,7 +185,7 @@
 			x = -((core.frame - 1) * settings.width);
 			y = 0;
 
-			moveBackgroundTo(x, y);
+			return moveBackgroundTo(x, y);
 		};
 
 		gotoNextFrame = function(offset) {
