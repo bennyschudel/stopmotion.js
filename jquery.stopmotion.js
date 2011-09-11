@@ -1,10 +1,10 @@
-(function($) {
+;(function($, undefined) {
 
 	$.StopMotion = function(element, options) {
 		var self, el, core, init,
 			setState, setDirection,
 			isVisible, isForward, isBackward, isPlaying, isPaused, isStopped, changeFps,
-			run, getDimensions, moveBackgroundTo, gotoFrame, gotoNextFrame, gotoPreviousFrame;
+			run, grabDimensions, moveBackgroundTo, gotoFrame, gotoNextFrame, gotoPreviousFrame;
 
 		self = this;
 
@@ -13,14 +13,19 @@
 			frames: 12,
 			width: null,
 			height: null,
+			columns: null,
+			gutter_width: 0,
+			gutter_height: 0,
 			loop: true
 		};
 		settings = {};
 
 		core = {
 			frame: 1,
+			width: null,
+			height: null,
+			columns: null,
 			offset: null,
-			gutter: 0,
 			direction: 'forward',
 			state: 'stopped',
 			oldState: 'stopped'
@@ -30,6 +35,8 @@
 		init = function() {
 			settings = $.extend(true, {}, defaults, options);
 			el = $(element);
+
+			core.columns = settings.columns || settings.frames;
 
 			grabDimensions();
 			self.play();
@@ -160,45 +167,48 @@
 
 			// functions
 		grabDimensions = function() {
-			settings.width = parseInt(el.css('width'), 10);
-			settings.height = parseInt(el.css('height'), 10);
+			core.width = settings.width || parseInt(el.css('width'), 10);
+			core.height = settings.height || parseInt(el.css('height'), 10);
 		};
 
 		moveBackgroundTo = function(x, y) {
 			core.offset = [x, y];
-			el.css('background-position', core.offset.join('px '));
+			el.css('background-position', x+'px '+y+'px');
 		};
 
 		gotoFrame = function(frame) {
-			var x, y, exit;
+			var row, col, x, y, exit;
 
 			// create loop
 			if (isBackward() && frame < 1) {
-				if (!settings.loop) { return self.pause(); }
+				if (!settings.loop) { self.pause(); return; }
 				frame = settings.frames;
 			}
 			else if (frame > settings.frames) {
-				if (!settings.loop) { return self.pause(); }
+				if (!settings.loop) { self.pause(); return; }
 				frame = 1;
 			}
 			core.frame = frame;
 
-			x = -((core.frame - 1) * settings.width);
-			y = 0;
+			row = Math.ceil(frame / core.columns);
+			col = frame - Math.floor(frame / core.columns) * core.columns;
 
-			return moveBackgroundTo(x, y);
+			x = -((col - 1) * (core.width + settings.gutter_width * 2));
+			y = -((row - 1) * (core.height + settings.gutter_height * 2));
+
+			moveBackgroundTo(x, y);
 		};
 
 		gotoNextFrame = function(offset) {
 			offset = offset || 1;
 
-			return gotoFrame(core.frame + offset);
+			gotoFrame(core.frame + offset);
 		};
 
 		gotoPreviousFrame = function(offset) {
 			offset = offset || 1;
 
-			return gotoFrame(core.frame - offset);
+			gotoFrame(core.frame - offset);
 		};
 
 		run = function() {
