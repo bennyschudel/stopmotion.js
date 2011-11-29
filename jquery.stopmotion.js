@@ -2,9 +2,8 @@
 
 	$.StopMotion = function(element, options) {
 		var self, el, core, init,
-			setState, setDirection,
-			isVisible, isForward, isBackward, isPlaying, isPaused, isStopped, changeFps,
-			run, grabDimensions, moveBackgroundTo, gotoFrame, gotoNextFrame, gotoPreviousFrame;
+			setState, setDirection, changeFps,
+			run, grabDimensions, moveBackgroundTo;
 
 		self = this;
 
@@ -14,8 +13,8 @@
 			width: null,
 			height: null,
 			columns: null,
-			gutter_width: 0,
-			gutter_height: 0,
+			gutterWidth: 0,
+			gutterHeight: 0,
 			loop: true
 		};
 		settings = {};
@@ -44,7 +43,7 @@
 
 		// public
 		self.play = function() {
-			if (!isVisible()) { return self; }
+			if (!self.isVisible()) { return self; }
 
 			self.pause();
 			setDirection('forward');
@@ -55,7 +54,7 @@
 		};
 
 		self.reverse = function() {
-			if (!isVisible()) { return self; }
+			if (!self.isVisible()) { return self; }
 
 			self.pause();
 			setDirection('backward');
@@ -70,7 +69,7 @@
 
 			clearInterval(core.interval);
 			setState('stopped');
-			gotoFrame((end) ? settings.frames : 1);
+			self.gotoFrame((end) ? settings.frames : 1);
 
 			return self;
 		};
@@ -83,15 +82,15 @@
 		};
 
 		self.resume = function(force) {
-			if (!isVisible() || isPlaying()) { return self; }
+			if (!self.isVisible() || self.isPlaying()) { return self; }
 
-			self[isBackward() ? 'reverse' : 'play']();
+			self[self.isBackward() ? 'reverse' : 'play']();
 
 			return self;
 		};
 
 		self.toggle = function() {
-			if (isPlaying()) {
+			if (self.isPlaying()) {
 				self.pause();
 			}
 			else {
@@ -111,7 +110,7 @@
 		};
 
 		self.show = function(autoplay) {
-			if (isVisible()) { return self; }
+			if (self.isVisible()) { return self; }
 
 			autoplay = !!autoplay;
 
@@ -127,7 +126,7 @@
 		};
 
 		self.hide = function(pause) {
-			if (!isVisible()) { return self; }
+			if (!self.isVisible()) { return self; }
 
 			el.hide();
 			self.pause();
@@ -135,7 +134,63 @@
 			return self;
 		};
 
-		// private
+			// frame methods
+		self.gotoFrame = function(frame) {
+			var row, col, x, y, exit;
+
+			// create loop
+			if (self.isBackward() && frame < 1) {
+				if (!settings.loop) { self.pause(); return; }
+				frame = settings.frames;
+			}
+			else if (frame > settings.frames) {
+				if (!settings.loop) { self.pause(); return; }
+				frame = 1;
+			}
+			core.frame = frame;
+
+			row = Math.ceil(frame / core.columns);
+			col = frame - Math.floor(frame / core.columns) * core.columns;
+
+			x = -((col - 1) * (core.width + settings.gutterWidth * 2));
+			y = -((row - 1) * (core.height + settings.gutterHeight * 2));
+
+			moveBackgroundTo(x, y);
+		};
+
+		self.gotoNextFrame = function(offset) {
+			offset = offset || 1;
+
+			self.gotoFrame(core.frame + offset);
+		};
+
+		self.gotoPreviousFrame = function(offset) {
+			offset = offset || 1;
+
+			self.gotoFrame(core.frame - offset);
+		};
+
+			// is methods
+		self.isVisible = function() {
+			return (el.is(':visible'));
+		};
+		self.isForward = function() {
+			return (core.direction === 'forward');
+		};
+		self.isBackward = function() {
+			return (core.direction === 'backward');
+		};
+		self.isPlaying = function() {
+			return (core.state === 'playing');
+		};
+		self.isPaused = function() {
+			return (core.state === 'paused');
+		};
+		self.isStopped = function() {
+			return (core.state === 'stopped');
+		};
+
+				// private
 			// setters
 		setState = function(state) {
 			core.oldState = core.state;
@@ -143,26 +198,6 @@
 		};
 		setDirection = function(direction) {
 			core.direction = direction;
-		};
-
-			// is methods
-		isVisible = function() {
-			return (el.is(':visible'));
-		};
-		isForward = function() {
-			return (core.direction === 'forward');
-		};
-		isBackward = function() {
-			return (core.direction === 'backward');
-		};
-		isPlaying = function() {
-			return (core.state === 'playing');
-		};
-		isPaused = function() {
-			return (core.state === 'paused');
-		};
-		isStopped = function() {
-			return (core.state === 'stopped');
 		};
 
 			// functions
@@ -176,47 +211,12 @@
 			el.css('background-position', x+'px '+y+'px');
 		};
 
-		gotoFrame = function(frame) {
-			var row, col, x, y, exit;
-
-			// create loop
-			if (isBackward() && frame < 1) {
-				if (!settings.loop) { self.pause(); return; }
-				frame = settings.frames;
-			}
-			else if (frame > settings.frames) {
-				if (!settings.loop) { self.pause(); return; }
-				frame = 1;
-			}
-			core.frame = frame;
-
-			row = Math.ceil(frame / core.columns);
-			col = frame - Math.floor(frame / core.columns) * core.columns;
-
-			x = -((col - 1) * (core.width + settings.gutter_width * 2));
-			y = -((row - 1) * (core.height + settings.gutter_height * 2));
-
-			moveBackgroundTo(x, y);
-		};
-
-		gotoNextFrame = function(offset) {
-			offset = offset || 1;
-
-			gotoFrame(core.frame + offset);
-		};
-
-		gotoPreviousFrame = function(offset) {
-			offset = offset || 1;
-
-			gotoFrame(core.frame - offset);
-		};
-
 		run = function() {
-			if (!isVisible()) { return; }
+			if (!self.isVisible()) { return; }
 
 			clearInterval(core.interval);
 			core.interval = setInterval(function() {
-				isBackward() ? gotoPreviousFrame() : gotoNextFrame();
+				self.isBackward() ? self.gotoPreviousFrame() : self.gotoNextFrame();
 			}, 1e3 / settings.fps);
 		};
 
