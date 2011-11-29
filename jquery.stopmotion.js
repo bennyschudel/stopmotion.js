@@ -1,24 +1,18 @@
-;(function($, undefined) {
+/*
+ * sa.StopMotion
+ */
+(function($, undefined) {
+	var ns = 'sa';
 
-	$.StopMotion = function(element, options) {
-		var self, el, core, init,
-			setState, setDirection, changeFps,
-			run, grabDimensions, moveBackgroundTo;
+	if (!$[ns]) { $[ns] = {}; }
 
-		self = this;
+	$[ns].StopMotion = function(element, options) {
+		var setState, setDirection,
+			run, grabDimensions, moveBackgroundTo,
 
-		defaults = {
-			fps: 12,
-			frames: 12,
-			width: null,
-			height: null,
-			columns: null,
-			gutterWidth: 0,
-			gutterHeight: 0,
-			loop: true
-		};
-		settings = {};
+		self = this,
 
+		opt = {},
 		core = {
 			frame: 1,
 			width: null,
@@ -28,27 +22,34 @@
 			direction: 'forward',
 			state: 'stopped',
 			oldState: 'stopped'
-		};
+		},
+		labels = {},
 
-		// init
-		init = function() {
-			settings = $.extend(true, {}, defaults, options);
-			el = $(element);
+		el = self.el = element,
+		$el = self.$el = $(element);
 
-			core.columns = settings.columns || settings.frames;
+		self.init = function () {
+			$el.data(ns+'.StopMotion', self);
 
+			$.extend(
+				opt,
+				$[ns].StopMotion.defaultOptions,
+				self.$el.data(ns+'.StopMotion-options'),
+				options
+			);
+
+			core.columns = opt.columns || opt.frames;
 			grabDimensions();
-			self.play();
 		};
 
 		// public
-		self.play = function() {
+		self.play = function(cback) {
 			if (!self.isVisible()) { return self; }
 
 			self.pause();
 			setDirection('forward');
 			setState('playing');
-			run();
+			run(cback);
 
 			return self;
 		};
@@ -69,7 +70,7 @@
 
 			clearInterval(core.interval);
 			setState('stopped');
-			self.gotoFrame((end) ? settings.frames : 1);
+			self.gotoFrame((end) ? opt.frames : 1);
 
 			return self;
 		};
@@ -101,12 +102,12 @@
 		};
 
 		self.changeFps = function(fps) {
-			settings.fps = fps;
+			opt.fps = fps;
 			run();
 		};
 
 		self.loop = function(loop) {
-			settings.loop = loop;
+			opt.loop = loop;
 		};
 
 		self.show = function(autoplay) {
@@ -140,11 +141,11 @@
 
 			// create loop
 			if (self.isBackward() && frame < 1) {
-				if (!settings.loop) { self.pause(); return; }
-				frame = settings.frames;
+				if (!opt.loop) { self.pause(); return; }
+				frame = opt.frames;
 			}
-			else if (frame > settings.frames) {
-				if (!settings.loop) { self.pause(); return; }
+			else if (frame > opt.frames) {
+				if (!opt.loop) { self.pause(); return; }
 				frame = 1;
 			}
 			core.frame = frame;
@@ -152,8 +153,8 @@
 			row = Math.ceil(frame / core.columns);
 			col = frame - Math.floor(frame / core.columns) * core.columns;
 
-			x = -((col - 1) * (core.width + settings.gutterWidth * 2));
-			y = -((row - 1) * (core.height + settings.gutterHeight * 2));
+			x = -((col - 1) * (core.width + opt.gutterWidth * 2));
+			y = -((row - 1) * (core.height + opt.gutterHeight * 2));
 
 			moveBackgroundTo(x, y);
 		};
@@ -172,7 +173,7 @@
 
 			// is methods
 		self.isVisible = function() {
-			return (el.is(':visible'));
+			return ($el.is(':visible'));
 		};
 		self.isForward = function() {
 			return (core.direction === 'forward');
@@ -202,13 +203,13 @@
 
 			// functions
 		grabDimensions = function() {
-			core.width = settings.width || parseInt(el.css('width'), 10);
-			core.height = settings.height || parseInt(el.css('height'), 10);
+			core.width = opt.width || parseInt($el.css('width'), 10);
+			core.height = opt.height || parseInt($el.css('height'), 10);
 		};
 
 		moveBackgroundTo = function(x, y) {
 			core.offset = [x, y];
-			el.css('background-position', x+'px '+y+'px');
+			$el.css('background-position', x+'px '+y+'px');
 		};
 
 		run = function() {
@@ -217,10 +218,27 @@
 			clearInterval(core.interval);
 			core.interval = setInterval(function() {
 				self.isBackward() ? self.gotoPreviousFrame() : self.gotoNextFrame();
-			}, 1e3 / settings.fps);
+			}, 1e3 / opt.fps);
 		};
 
-		init();
+		self.init();
 	};
 
+	$[ns].StopMotion.defaultOptions = {
+		fps: 12,
+		frames: 12,
+		width: null,
+		height: null,
+		columns: null,
+		gutterWidth: 0,
+		gutterHeight: 0,
+		loop: true,
+		autoPlay: false
+	};
+
+	$.fn[ns+'StopMotion'] = function(params, options) {
+		return this.each(function () {
+			(new $[ns].StopMotion(this, params, options));
+		});
+	};
 })(jQuery);
